@@ -41,5 +41,5 @@ private:
 
 	void Move(const FInputActionValue& InputActionValue);
 
-	void CusorTrace();
+	void CursorTrace();
 };
