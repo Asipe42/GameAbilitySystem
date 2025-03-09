@@ -31,10 +31,12 @@ void UOverlayWidgetController::BindCallbacksToDependencies()
 		{
 			for (const FGameplayTag& Tag : AssetTags)
 			{
-				FString Msg = FString::Printf(TEXT("GE Tag %s"), *Tag.ToString());
-				GEngine->AddOnScreenDebugMessage(-1, 8.f, FColor::Blue, Msg);
-
-				FUIWidgetRow* Row = GetDataTableRowByTag<FUIWidgetRow>(MessageWidgetDataTable, Tag);
+				FGameplayTag MessageTag = FGameplayTag::RequestGameplayTag(FName("Message"));
+				if (Tag.MatchesTag(MessageTag))
+				{
+					FUIWidgetRow* Row = GetDataTableRowByTag<FUIWidgetRow>(MessageWidgetDataTable, Tag);
+					FMessageWidgetRowDelegate.Broadcast(*Row);
+				}
 			}
 		}	
 	);
@@ -60,3 +62,8 @@ void UOverlayWidgetController::MaxManaChanged(const FOnAttributeChangeData& Data
 	OnMaxManaChanged.Broadcast(Data.NewValue);
 }
 
+template <typename T>
+T* UOverlayWidgetController::GetDataTableRowByTag(UDataTable* DataTable, const FGameplayTag& Tag)
+{
+	return DataTable->FindRow<T>(Tag.GetTagName(), TEXT(""));
+}
